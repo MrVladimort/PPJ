@@ -1,0 +1,112 @@
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.*;
+
+public class Main extends Frame    {
+
+    Color tab[][];
+
+    public static void main(String[] args)    {
+        new Main();
+    }
+
+    public void paint(Graphics g)    {
+        for(int i = 0; i<tab.length; i++)    {
+            for(int j = 0; j<tab[i].length; j++)    {
+                g.setColor(tab[i][j]);
+                g.drawLine(100+j, 100+i, 100+j , 100+i);
+                g.drawLine(tab[i].length+100-j, tab.length+100-i+tab.length,
+                        tab[i].length+100-j, tab.length+100-i+tab.length);
+            }
+        }
+    }
+
+    public Main()    {
+        file();
+        setSize( 720, 800);
+        setVisible(true);
+        addWindowListener(new WindowAdapter()    {
+            public void windowClosing(WindowEvent evt)    {
+                System.exit(0);}
+        });
+
+        new Thread()    {
+            public void run()    {
+                while(true)    {
+
+                    repaint();
+                    try    {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e)    {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.start();
+    }
+
+    public void file()    {
+        try    {
+            FileReader fr = new FileReader("C:\\Users\\s15567\\workspace\\Czw27\\src\\snow.ppm");
+                for (int i = 0; i <= 25; i++)    {
+                    fr.read();
+                }
+
+            String argument ="";
+            int height = 0;
+            int width = 0;
+            int R = 0;
+            int G = 0;
+            int B = 0;
+
+            height += (fr.read()-48)*100;
+            height += (fr.read()-48)*10;
+            height += (fr.read()-48);
+
+            fr.read();
+
+            width += (fr.read()-48)*100;
+            width += (fr.read()-48)*10;
+            width += (fr.read()-48);
+
+            fr.read();
+            fr.read();
+            fr.read();
+            fr.read();
+            fr.read();
+            fr.read();
+
+            tab = new Color[width][height];
+
+            for(int i = 0; i<tab.length; i++)    {
+                for (int j = 0; j<tab[i].length; j++)    {
+                    for(int b = 0; b < 3; b++)    {
+                        int tmp = fr.read();
+                        
+                        if(tmp == 10)
+                           tmp = fr.read();
+                        
+                        while(tmp != ' ')    {
+                            argument += (char) tmp;
+                            tmp = fr.read();}
+                        
+                        if(b == 0)
+                            R = Integer.parseInt(argument);
+                        else if(b == 1)
+                            G = Integer.parseInt(argument);
+                        else if(b == 2)
+                            B = Integer.parseInt(argument);
+                        
+                        argument = "";
+                    }
+                    tab[i][j] = new Color(R, G, B);
+                }
+            }
+        }catch (FileNotFoundException ex)    {
+            ex.printStackTrace();
+        }catch (IOException ex)    {
+            ex.printStackTrace();
+        }
+    }
+}
